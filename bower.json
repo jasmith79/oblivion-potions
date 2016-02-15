@@ -1,0 +1,23 @@
+{
+  "name": "oblivion-potions",
+  "homepage": "https://github.com/jasmith79/oblivion-potions",
+  "authors": [
+    "jsmith <jasmith79@gmail.com>"
+  ],
+  "description": "Oblivion Potion Generator",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ramda": "^0.19.1",
+    "decorators-js": "https://github.com/jasmith79/decorators-js.git",
+    "promise-addons": "https://github.com/jasmith79/promise-addons.git"
+  }
+}
