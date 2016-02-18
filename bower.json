@@ -18,6 +18,7 @@
   "dependencies": {
     "ramda": "^0.19.1",
     "decorators-js": "https://github.com/jasmith79/decorators-js.git",
-    "promise-addons": "https://github.com/jasmith79/promise-addons.git"
+    "promise-addons": "https://github.com/jasmith79/promise-addons.git",
+    "mathjs": "^2.7.0"
   }
 }
