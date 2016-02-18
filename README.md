@@ -22,35 +22,35 @@ this project is using it for language acquisition.
 
 To be conformant, an implementation must generate the following:
 
-  -A csv of potions containing at least one potion with each of the following positive effects:
-    -Reflect Damage
-    -Reflect Spell
-    -Fortify Health
-    -Fortify Endurance
-    -Fortify Magicka
-    -Fortify Strength
-    -Fortify Speed
-    -Restore Health
-    -Restore Magicka
-    -Shock Shield
-    -Shield
-    -Fortify Agility
-    -Fortify Intelligence
-    -Fortify Willpower
-    -Fortify Fatigue
-    -Resist Magicka
-    -Spell Absorption
-    -Fire Shield
-    -Frost Shield
-    -Restore Endurance
-    -Light
-    -Restore Fatigue
-    -Invisibility
-    -Fortify Luck
-    -Chameleon
-    -Fortify Personality
-  -A csv of four-potion combinations with the highest possible scores\*
-  -A csv of the ingredients needed for each combination.
+  * A csv of potions containing at least one potion with each of the following positive effects:
+    * Reflect Damage
+    * Reflect Spell
+    * Fortify Health
+    * Fortify Endurance
+    * Fortify Magicka
+    * Fortify Strength
+    * Fortify Speed
+    * Restore Health
+    * Restore Magicka
+    * Shock Shield
+    * Shield
+    * Fortify Agility
+    * Fortify Intelligence
+    * Fortify Willpower
+    * Fortify Fatigue
+    * Resist Magicka
+    * Spell Absorption
+    * Fire Shield
+    * Frost Shield
+    * Restore Endurance
+    * Light
+    * Restore Fatigue
+    * Invisibility
+    * Fortify Luck
+    * Chameleon
+    * Fortify Personality
+  * A csv of four-potion combinations with the highest possible scores\*
+  * A csv of the ingredients needed for each combination.
 
 \*Scoring is as follows: &#931;effect's-position-in-positive-list^2
 
