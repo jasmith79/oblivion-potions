@@ -8,16 +8,15 @@
  'use strict';
 
 // /*   Constants   */
-// const MAX_INGREDIENTS       = 4;
-// const MAX_INGREDIENTS_ARRAY = [0, 1, 2, 3];
-// const notAFunctionError     = new Error('Missing function argument');
-const ARGS      = process.argv.slice(2).join(' ');
-const VERBOSE   = ARGS.match(/-[a-z]*v/gi);
-const TIMED     = ARGS.match(/-[a-z]*t/gi);
-const MIN_SCORE = 800;
-const BILLION   = 1e9;
-const START     = process.hrtime();
-const priority  = [
+const ARGS             = process.argv.slice(2).join(' ');
+const VERBOSE          = ARGS.match(/-[a-z]*v/gi);
+const TIMED            = ARGS.match(/-[a-z]*t/gi);
+const MIN_POTION_SCORE = 800;
+const MIN_COMBO_SCORE  = 3000;
+const BILLION          = 1e9;
+const NEGATIVE         = /burden|paralyze|silence|damage|drain/ig;
+const START            = process.hrtime();
+const priority         = [
     "Reflect Damage",
     "Reflect Spell",
     "Fortify Health",
@@ -48,22 +47,9 @@ const priority  = [
 
 /*   Imports   */
 const fs    = require('fs');
-// const r     = require('../bower_components/ramda/dist/ramda.js');
-// const d     = require('../bower_components/decorators-js/decorators.js');
-// const math  = require('../bower_components/mathjs/dist/math.js');
+const r     = require('../bower_components/ramda/dist/ramda.js');
 
 /*   Functions   */
-
-// const zipN = (...args) => {
-//   let fn = typeof args[args.length - 1] === 'function' ? args.pop() : (...fnArgs) => fnArgs;
-//   let arr = [];
-//   let shortest = args.reduce((acc, x) => Math.min(acc, x.length), Number.MAX_SAFE_INTEGER);
-//   for (let i = 0; i < shortest; ++i) {
-//     arr.push(fn(...args.map(x => x[i])));
-//   }
-//   return arr;
-// };
-
 const toSeconds = ([secs, ns]) => ((secs * BILLION + ns) / BILLION).toFixed(2);
 const toObject = (list) => list.reduce((acc, k) => {acc[k] = 0; return acc}, {});
 const takeTop = (effects) => (item) => {
@@ -77,7 +63,21 @@ const takeTop = (effects) => (item) => {
   return passed;
 };
 
-const scorePotion = (effs) => {
+const filterNegatives = (item) => item.match(NEGATIVE);
+
+const strictSuperior = (item, i, arr) => {
+  let passed = true;
+  for (let j = i + 1; j < arr.length; ++j) {
+    if (r.equals(item.positives, arr[j].positives) &&
+         (item.negatives.length >= arr[j].negatives.length)) {
+      passed = false;
+      break;
+    }
+  }
+  return passed;
+}
+
+const scoreItem = (effs) => {
   let score = 0;
   effs.forEach(eff => {
     let index = priority.indexOf(eff);
@@ -93,23 +93,48 @@ class Potion {
     let [recipe, effects] = ingreds.reduce((acc, ingred) => {
       let [name, ...eff] = ingred.split(',');
       let [names, effs]  = acc;
-      names.push(name);
-      effs.push(...eff);
-      return [names, effs];
+      acc[0].push(name);
+      acc[1].push(...eff);
+      return acc;
     }, [[],[]]);
-    this.name = '' + name;
-    this.recipe = recipe.join(',');
+    this.name    = '' + name;
+    this.recipe  = recipe;
     this.effects = effects.reduce((acc, eff, i) => {
       if (effects.indexOf(eff) !== i && (acc.indexOf(eff) === -1)) {
         acc.push(eff);
       }
       return acc;
-    }, []);
-    this.score   = scorePotion(this.effects);
+    }, []).sort();
+    [this.negatives, this.positives] = r.partition(filterNegatives, this.effects);
+    this.score = scoreItem(this.positives);
   }
 
   toString () {
-    return `${this.name},${this.score},${this.effects.join(',')},${this.recipe}`;
+    return `${this.name},${this.score},${this.effects.join(',')},${this.recipe.join(',')}`;
+  }
+}
+
+class Combo {
+  constructor (...potions) {
+    let [recipe, effects] = potions.reduce((acc, potion) => {
+      acc[0].push(potion.recipe);
+      potions.forEach((potion) => {
+        potion.effects.forEach((eff) => {
+          if (acc[1].indexOf(eff) === -1) {
+            acc[1].push(eff)
+          }
+        });
+      });
+      return acc;
+    }, [[], []]);
+    this.recipe = recipe.join(',');
+    this.effects = effects.sort();
+    [this.negatives, this.positives] = r.partition(filterNegatives, this.effects);
+    this.score = scoreItem(this.positives);
+  }
+
+  toString () {
+    return `${this.recipe},${this.score},${this.effects.join(',')}`;
   }
 }
 
@@ -134,6 +159,9 @@ if (VERBOSE) {
   console.log(`done${timeStr}. Creating potions...`);
 }
 
+//because of the dataset size, for loops and copy/paste are vastly more efficient here than mapping
+//over ranges and encapsulating it in a function or trampolining the general-case recursive solution
+//it literally shaves *minutes* off the runtime of the program.
 let potions = ((list) => {
   let l = list.length, arr = [], potion = null, n = 0;
   for (n; n < l - 3; ++n) {
@@ -144,7 +172,7 @@ let potions = ((list) => {
         let k = j + 1
         for (k; k < l; ++k) {
           potion = new Potion(n + i + j + k, list[n], list[i], list[j], list[k]);
-          if (potion.score > MIN_SCORE) {
+          if (potion.score > MIN_POTION_SCORE) {
             if (VERBOSE) {
               console.log(potion.recipe);
             }
@@ -156,7 +184,8 @@ let potions = ((list) => {
   }
   return arr
     .sort((a, b) => b.score - a.score)
-    .filter(takeTop(toObject(priority)));
+    .filter(takeTop(toObject(priority)))
+    .filter(strictSuperior);
 })(csvList);
 
 if (VERBOSE) {
@@ -182,6 +211,67 @@ if (VERBOSE) {
   }
   console.log(`done${timeStr}. Generating combinations...`);
 }
+
+let combos = ((list) => {
+  let l = list.length, arr = [], combo = null, n = 0;
+  for (n; n < l - 3; ++n) {
+    let i = n + 1;
+    for (i; i < l - 2; ++i) {
+      let j = i + 1;
+      for (j; j < l - 1; ++j) {
+        let k = j + 1
+        for (k; k < l; ++k) {
+          combo = new Combo(list[n], list[i], list[j], list[k]);
+          if (combo.score > MIN_COMBO_SCORE) {
+            if (VERBOSE) {
+              console.log(combo.recipe);
+            }
+            arr.push(combo);
+          }
+        }
+      }
+    }
+  }
+  return arr
+    .sort((a, b) => b.score - a.score)
+    .filter(takeTop(toObject(priority)))
+    .filter(strictSuperior);
+})(potions);
+
+if (VERBOSE) {
+  if (TIMED) {
+    time = process.hrtime(last);
+    last = process.hrtime();
+    timeStr = ` in ${toSeconds(time)} seconds`;
+  } else {
+    timeStr = '';
+  }
+  console.log(`done${timeStr}. Writing File...`);
+}
+
+let shoppingList = [];
+fs.writeFileSync(
+  './combos.csv',
+  combos
+    .map((c) => {
+      shoppingList.push(c.recipe);
+      c.toString()
+    })
+    .join('\n')
+);
+
+if (VERBOSE) {
+  if (TIMED) {
+    time = process.hrtime(last);
+    last = process.hrtime();
+    timeStr = ` in ${toSeconds(time)} seconds`;
+  } else {
+    timeStr = '';
+  }
+  console.log(`done${timeStr}. Writing Shopping List...`);
+}
+
+fs.writeFileSync('./shopping.csv', shoppingList.join('\n'));
 
 if (TIMED) {
   console.log(`Completed in ${toSeconds(process.hrtime(START))} seconds.`);

@@ -9,9 +9,6 @@
 'use strict';
 
 // /*   Constants   */
-// const MAX_INGREDIENTS       = 4;
-// const MAX_INGREDIENTS_ARRAY = [0, 1, 2, 3];
-// const notAFunctionError     = new Error('Missing function argument');
 
 var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
 
@@ -26,29 +23,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var ARGS = process.argv.slice(2).join(' ');
 var VERBOSE = ARGS.match(/-[a-z]*v/gi);
 var TIMED = ARGS.match(/-[a-z]*t/gi);
-var MIN_SCORE = 800;
+var MIN_POTION_SCORE = 800;
+var MIN_COMBO_SCORE = 3000;
 var BILLION = 1e9;
+var NEGATIVE = /burden|paralyze|silence|damage|drain/ig;
 var START = process.hrtime();
 var priority = ["Reflect Damage", "Reflect Spell", "Fortify Health", "Fortify Endurance", "Fortify Magicka", "Fortify Strength", "Fortify Speed", "Restore Health", "Restore Magicka", "Shock Shield", "Shield", "Fortify Agility", "Fortify Intelligence", "Fortify Willpower", "Fortify Fatigue", "Resist Magicka", "Spell Absorption", "Fire Shield", "Frost Shield", "Restore Endurance", "Light", "Restore Fatigue", "Invisibility", "Fortify Luck", "Chameleon", "Fortify Personality"].reverse();
 
 /*   Imports   */
 var fs = require('fs');
-// const r     = require('../bower_components/ramda/dist/ramda.js');
-// const d     = require('../bower_components/decorators-js/decorators.js');
-// const math  = require('../bower_components/mathjs/dist/math.js');
+var r  = require('../bower_components/ramda/dist/ramda.js');
 
 /*   Functions   */
-
-// const zipN = (...args) => {
-//   let fn = typeof args[args.length - 1] === 'function' ? args.pop() : (...fnArgs) => fnArgs;
-//   let arr = [];
-//   let shortest = args.reduce((acc, x) => Math.min(acc, x.length), Number.MAX_SAFE_INTEGER);
-//   for (let i = 0; i < shortest; ++i) {
-//     arr.push(fn(...args.map(x => x[i])));
-//   }
-//   return arr;
-// };
-
 var toSeconds = function toSeconds(_ref) {
   var _ref2 = _slicedToArray(_ref, 2);
 
@@ -58,8 +44,7 @@ var toSeconds = function toSeconds(_ref) {
 };
 var toObject = function toObject(list) {
   return list.reduce(function (acc, k) {
-    acc[k] = 0;
-    return acc;
+    acc[k] = 0;return acc;
   }, {});
 };
 var takeTop = function takeTop(effects) {
@@ -75,7 +60,22 @@ var takeTop = function takeTop(effects) {
   };
 };
 
-var scorePotion = function scorePotion(effs) {
+var filterNegatives = function filterNegatives(item) {
+  return item.match(NEGATIVE);
+};
+
+var strictSuperior = function strictSuperior(item, i, arr) {
+  var passed = true;
+  for (var j = i + 1; j < arr.length; ++j) {
+    if (r.equals(item.positives, arr[j].positives) && item.negatives.length >= arr[j].negatives.length) {
+      passed = false;
+      break;
+    }
+  }
+  return passed;
+};
+
+var scoreItem = function scoreItem(effs) {
   var score = 0;
   effs.forEach(function (eff) {
     var index = priority.indexOf(eff);
@@ -95,6 +95,8 @@ var Potion = (function () {
     }
 
     var _ingreds$reduce = ingreds.reduce(function (acc, ingred) {
+      var _acc$1;
+
       var _ingred$split = ingred.split(',');
 
       var _ingred$split2 = _toArray(_ingred$split);
@@ -108,9 +110,9 @@ var Potion = (function () {
       var names = _acc[0];
       var effs = _acc[1];
 
-      names.push(name);
-      effs.push.apply(effs, _toConsumableArray(eff));
-      return [names, effs];
+      acc[0].push(name);
+      (_acc$1 = acc[1]).push.apply(_acc$1, _toConsumableArray(eff));
+      return acc;
     }, [[], []]);
 
     var _ingreds$reduce2 = _slicedToArray(_ingreds$reduce, 2);
@@ -119,24 +121,80 @@ var Potion = (function () {
     var effects = _ingreds$reduce2[1];
 
     this.name = '' + name;
-    this.recipe = recipe.join(',');
+    this.recipe = recipe;
     this.effects = effects.reduce(function (acc, eff, i) {
       if (effects.indexOf(eff) !== i && acc.indexOf(eff) === -1) {
         acc.push(eff);
       }
       return acc;
-    }, []);
-    this.score = scorePotion(this.effects);
+    }, []).sort();
+
+    var _r$partition = r.partition(filterNegatives, this.effects);
+
+    var _r$partition2 = _slicedToArray(_r$partition, 2);
+
+    this.negatives = _r$partition2[0];
+    this.positives = _r$partition2[1];
+
+    this.score = scoreItem(this.positives);
   }
 
   _createClass(Potion, [{
     key: 'toString',
     value: function toString() {
-      return this.name + ',' + this.score + ',' + this.effects.join(',') + ',' + this.recipe;
+      return this.name + ',' + this.score + ',' + this.effects.join(',') + ',' + this.recipe.join(',');
     }
   }]);
 
   return Potion;
+})();
+
+var Combo = (function () {
+  function Combo() {
+    for (var _len2 = arguments.length, potions = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      potions[_key2] = arguments[_key2];
+    }
+
+    _classCallCheck(this, Combo);
+
+    var _potions$reduce = potions.reduce(function (acc, potion) {
+      acc[0].push(potion.recipe);
+      potions.forEach(function (potion) {
+        potion.effects.forEach(function (eff) {
+          if (acc[1].indexOf(eff) === -1) {
+            acc[1].push(eff);
+          }
+        });
+      });
+      return acc;
+    }, [[], []]);
+
+    var _potions$reduce2 = _slicedToArray(_potions$reduce, 2);
+
+    var recipe = _potions$reduce2[0];
+    var effects = _potions$reduce2[1];
+
+    this.recipe = recipe.join(',');
+    this.effects = effects.sort();
+
+    var _r$partition3 = r.partition(filterNegatives, this.effects);
+
+    var _r$partition32 = _slicedToArray(_r$partition3, 2);
+
+    this.negatives = _r$partition32[0];
+    this.positives = _r$partition32[1];
+
+    this.score = scoreItem(this.positives);
+  }
+
+  _createClass(Combo, [{
+    key: 'toString',
+    value: function toString() {
+      return this.recipe + ',' + this.score + ',' + this.effects.join(',');
+    }
+  }]);
+
+  return Combo;
 })();
 
 var last = START,
@@ -162,6 +220,9 @@ if (VERBOSE) {
   console.log('done' + timeStr + '. Creating potions...');
 }
 
+//because of the dataset size, for loops and copy/paste are vastly more efficient here than mapping
+//over ranges and encapsulating it in a function or trampolining the general-case recursive solution
+//it literally shaves *minutes* off the runtime of the program.
 var potions = (function (list) {
   var l = list.length,
       arr = [],
@@ -175,7 +236,7 @@ var potions = (function (list) {
         var k = j + 1;
         for (k; k < l; ++k) {
           potion = new Potion(n + i + j + k, list[n], list[i], list[j], list[k]);
-          if (potion.score > MIN_SCORE) {
+          if (potion.score > MIN_POTION_SCORE) {
             if (VERBOSE) {
               console.log(potion.recipe);
             }
@@ -187,7 +248,7 @@ var potions = (function (list) {
   }
   return arr.sort(function (a, b) {
     return b.score - a.score;
-  }).filter(takeTop(toObject(priority)));
+  }).filter(takeTop(toObject(priority))).filter(strictSuperior);
 })(csvList);
 
 if (VERBOSE) {
@@ -215,6 +276,64 @@ if (VERBOSE) {
   }
   console.log('done' + timeStr + '. Generating combinations...');
 }
+
+var combos = (function (list) {
+  var l = list.length,
+      arr = [],
+      combo = null,
+      n = 0;
+  for (n; n < l - 3; ++n) {
+    var i = n + 1;
+    for (i; i < l - 2; ++i) {
+      var j = i + 1;
+      for (j; j < l - 1; ++j) {
+        var k = j + 1;
+        for (k; k < l; ++k) {
+          combo = new Combo(list[n], list[i], list[j], list[k]);
+          if (combo.score > MIN_COMBO_SCORE) {
+            if (VERBOSE) {
+              console.log(combo.recipe);
+            }
+            arr.push(combo);
+          }
+        }
+      }
+    }
+  }
+  return arr.sort(function (a, b) {
+    return b.score - a.score;
+  }).filter(takeTop(toObject(priority))).filter(strictSuperior);
+})(potions);
+
+if (VERBOSE) {
+  if (TIMED) {
+    time = process.hrtime(last);
+    last = process.hrtime();
+    timeStr = ' in ' + toSeconds(time) + ' seconds';
+  } else {
+    timeStr = '';
+  }
+  console.log('done' + timeStr + '. Writing File...');
+}
+
+var shoppingList = [];
+fs.writeFileSync('./combos.csv', combos.map(function (c) {
+  shoppingList.push(c.recipe);
+  c.toString();
+}).join('\n'));
+
+if (VERBOSE) {
+  if (TIMED) {
+    time = process.hrtime(last);
+    last = process.hrtime();
+    timeStr = ' in ' + toSeconds(time) + ' seconds';
+  } else {
+    timeStr = '';
+  }
+  console.log('done' + timeStr + '. Writing Shopping List...');
+}
+
+fs.writeFileSync('./shopping.csv', shoppingList.join('\n'));
 
 if (TIMED) {
   console.log('Completed in ' + toSeconds(process.hrtime(START)) + ' seconds.');
