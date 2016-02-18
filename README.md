@@ -52,7 +52,7 @@ To be conformant, an implementation must generate the following:
   * A csv of four-potion combinations with the highest possible scores\*
   * A csv of the ingredients needed for each combination.
 
-\*Scoring is as follows: &#931;effect's-position-in-positive-list^2
+\*Scoring is as follows: &#931; effect's-position-in-positive-list ^ 2
 
 Implementations must also provide command-line options for verbose output and runtime measurement.
 
