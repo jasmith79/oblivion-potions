@@ -11,7 +11,13 @@
 // const MAX_INGREDIENTS       = 4;
 // const MAX_INGREDIENTS_ARRAY = [0, 1, 2, 3];
 // const notAFunctionError     = new Error('Missing function argument');
-const priority = [
+const ARGS      = process.argv.slice(2).join(' ');
+const VERBOSE   = ARGS.match(/-[a-z]*v/gi);
+const TIMED     = ARGS.match(/-[a-z]*t/gi);
+const MIN_SCORE = 800;
+const BILLION   = 1e9;
+const START     = process.hrtime();
+const priority  = [
     "Reflect Damage",
     "Reflect Spell",
     "Fortify Health",
@@ -58,11 +64,24 @@ const fs    = require('fs');
 //   return arr;
 // };
 
+const toSeconds = ([secs, ns]) => ((secs * BILLION + ns) / BILLION).toFixed(2);
+const toObject = (list) => list.reduce((acc, k) => {acc[k] = 0; return acc}, {});
+const takeTop = (effects) => (item) => {
+  let passed = false;
+  item.effects.forEach((eff) => {
+    if (effects[eff] < 20) {
+      passed = true;
+    }
+    effects[eff] += 1;
+  });
+  return passed;
+};
+
 const scorePotion = (effs) => {
   let score = 0;
   effs.forEach(eff => {
     let index = priority.indexOf(eff);
-    if (index) {
+    if (index !== -1) {
       score += (index * index);
     }
   });
@@ -70,48 +89,101 @@ const scorePotion = (effs) => {
 }
 
 class Potion {
-  constructor (ingreds) {
-
+  constructor (name, ...ingreds) {
     let [recipe, effects] = ingreds.reduce((acc, ingred) => {
       let [name, ...eff] = ingred.split(',');
       let [names, effs]  = acc;
       names.push(name);
       effs.push(...eff);
       return [names, effs];
-    }, [[],[]])
-
+    }, [[],[]]);
+    this.name = '' + name;
     this.recipe = recipe.join(',');
-    this.effects = effects.filter((eff, i) => effects.indexOf(eff) !== i);
+    this.effects = effects.reduce((acc, eff, i) => {
+      if (effects.indexOf(eff) !== i && (acc.indexOf(eff) === -1)) {
+        acc.push(eff);
+      }
+      return acc;
+    }, []);
     this.score   = scorePotion(this.effects);
+  }
+
+  toString () {
+    return `${this.name},${this.score},${this.effects.join(',')},${this.recipe}`;
   }
 }
 
+let last = START, time = '', timeStr = '';
+
+if (VERBOSE) {
+  console.log("Reading file...");
+}
 
 let csvList = fs.readFileSync('../allingredients.csv', 'utf-8')
   .split('\n')
   .filter(row => row.length > 3 && !row.match(/,\s*,/g)); //filter out one-effect ingreds, empties
 
+if (VERBOSE) {
+  if (TIMED) {
+    time = process.hrtime(last);
+    last = process.hrtime();
+    timeStr = ` in ${toSeconds(time)} seconds`;
+  } else {
+    timeStr = '';
+  }
+  console.log(`done${timeStr}. Creating potions...`);
+}
+
 let potions = ((list) => {
   let l = list.length, arr = [], potion = null, n = 0;
   for (n; n < l - 3; ++n) {
-    let i = 1;
+    let i = n + 1;
     for (i; i < l - 2; ++i) {
-      let j = 2;
+      let j = i + 1;
       for (j; j < l - 1; ++j) {
-        let k = 3
+        let k = j + 1
         for (k; k < l; ++k) {
-          potion = new Potion([list[n], list[i], list[j], list[k]]);
-          if (potion.score > 500) {
-            console.log(potion.recipe);
+          potion = new Potion(n + i + j + k, list[n], list[i], list[j], list[k]);
+          if (potion.score > MIN_SCORE) {
+            if (VERBOSE) {
+              console.log(potion.recipe);
+            }
             arr.push(potion);
           }
         }
       }
     }
   }
-  return arr;
+  return arr
+    .sort((a, b) => b.score - a.score)
+    .filter(takeTop(toObject(priority)));
 })(csvList);
 
-console.log(combinations.length);
-console.log(combinations[0]);
-console.log(combinations[combinations.length - 1])
+if (VERBOSE) {
+  if (TIMED) {
+    time = process.hrtime(last);
+    last = process.hrtime();
+    timeStr = ` in ${toSeconds(time)} seconds`;
+  } else {
+    timeStr = '';
+  }
+  console.log(`done${timeStr}. ${potions.length} potions created. Writing file...`);
+}
+
+fs.writeFileSync('./potions.csv', potions.map((p) => p.toString()).join('\n'));
+
+if (VERBOSE) {
+  if (TIMED) {
+    time = process.hrtime(last);
+    last = process.hrtime();
+    timeStr = ` in ${toSeconds(time)} seconds`;
+  } else {
+    timeStr = '';
+  }
+  console.log(`done${timeStr}. Generating combinations...`);
+}
+
+if (TIMED) {
+  console.log(`Completed in ${toSeconds(process.hrtime(START))} seconds.`);
+}
+process.exit(0);
