@@ -45,6 +45,7 @@ const priority         = [
   "Fortify Personality"
 ].reverse();
 
+
 /*   Imports   */
 const fs    = require('fs');
 const r     = require('./node_modules/ramda/dist/ramda.js');

@@ -20,6 +20,7 @@ function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+
 var ARGS = process.argv.slice(2).join(' ');
 var VERBOSE = ARGS.match(/-[a-z]*v/gi);
 var TIMED = ARGS.match(/-[a-z]*t/gi);
