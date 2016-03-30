@@ -10,15 +10,15 @@
 
 // /*   Constants   */
 
-var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ARGS = process.argv.slice(2).join(' ');
 var VERBOSE = ARGS.match(/-[a-z]*v/gi);
@@ -32,7 +32,7 @@ var priority = ["Reflect Damage", "Reflect Spell", "Fortify Health", "Fortify En
 
 /*   Imports   */
 var fs = require('fs');
-var r  = require('../bower_components/ramda/dist/ramda.js');
+var r = require('./node_modules/ramda/dist/ramda.js');
 
 /*   Functions   */
 var toSeconds = function toSeconds(_ref) {
@@ -86,7 +86,7 @@ var scoreItem = function scoreItem(effs) {
   return score;
 };
 
-var Potion = (function () {
+var Potion = function () {
   function Potion(name) {
     _classCallCheck(this, Potion);
 
@@ -95,7 +95,7 @@ var Potion = (function () {
     }
 
     var _ingreds$reduce = ingreds.reduce(function (acc, ingred) {
-      var _acc$1;
+      var _acc$;
 
       var _ingred$split = ingred.split(',');
 
@@ -111,7 +111,7 @@ var Potion = (function () {
       var effs = _acc[1];
 
       acc[0].push(name);
-      (_acc$1 = acc[1]).push.apply(_acc$1, _toConsumableArray(eff));
+      (_acc$ = acc[1]).push.apply(_acc$, _toConsumableArray(eff));
       return acc;
     }, [[], []]);
 
@@ -147,9 +147,9 @@ var Potion = (function () {
   }]);
 
   return Potion;
-})();
+}();
 
-var Combo = (function () {
+var Combo = function () {
   function Combo() {
     for (var _len2 = arguments.length, potions = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
       potions[_key2] = arguments[_key2];
@@ -179,10 +179,10 @@ var Combo = (function () {
 
     var _r$partition3 = r.partition(filterNegatives, this.effects);
 
-    var _r$partition32 = _slicedToArray(_r$partition3, 2);
+    var _r$partition4 = _slicedToArray(_r$partition3, 2);
 
-    this.negatives = _r$partition32[0];
-    this.positives = _r$partition32[1];
+    this.negatives = _r$partition4[0];
+    this.positives = _r$partition4[1];
 
     this.score = scoreItem(this.positives);
   }
@@ -195,7 +195,7 @@ var Combo = (function () {
   }]);
 
   return Combo;
-})();
+}();
 
 var last = START,
     time = '',
@@ -223,7 +223,7 @@ if (VERBOSE) {
 //because of the dataset size, for loops and copy/paste are vastly more efficient here than mapping
 //over ranges and encapsulating it in a function or trampolining the general-case recursive solution
 //it literally shaves *minutes* off the runtime of the program.
-var potions = (function (list) {
+var potions = function (list) {
   var l = list.length,
       arr = [],
       potion = null,
@@ -237,9 +237,9 @@ var potions = (function (list) {
         for (k; k < l; ++k) {
           potion = new Potion(n + i + j + k, list[n], list[i], list[j], list[k]);
           if (potion.score > MIN_POTION_SCORE) {
-            if (VERBOSE) {
-              console.log(potion.recipe);
-            }
+            // if (VERBOSE) {
+            //   console.log(potion.recipe);
+            // }
             arr.push(potion);
           }
         }
@@ -249,7 +249,7 @@ var potions = (function (list) {
   return arr.sort(function (a, b) {
     return b.score - a.score;
   }).filter(takeTop(toObject(priority))).filter(strictSuperior);
-})(csvList);
+}(csvList);
 
 if (VERBOSE) {
   if (TIMED) {
@@ -277,7 +277,7 @@ if (VERBOSE) {
   console.log('done' + timeStr + '. Generating combinations...');
 }
 
-var combos = (function (list) {
+var combos = function (list) {
   var l = list.length,
       arr = [],
       combo = null,
@@ -291,9 +291,9 @@ var combos = (function (list) {
         for (k; k < l; ++k) {
           combo = new Combo(list[n], list[i], list[j], list[k]);
           if (combo.score > MIN_COMBO_SCORE) {
-            if (VERBOSE) {
-              console.log(combo.recipe);
-            }
+            // if (VERBOSE) {
+            //   console.log(combo.recipe);
+            // }
             arr.push(combo);
           }
         }
@@ -303,7 +303,7 @@ var combos = (function (list) {
   return arr.sort(function (a, b) {
     return b.score - a.score;
   }).filter(takeTop(toObject(priority))).filter(strictSuperior);
-})(potions);
+}(potions);
 
 if (VERBOSE) {
   if (TIMED) {

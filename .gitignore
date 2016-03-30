@@ -1,2 +1,15 @@
-bower_components/
+nodejs/bower_components/
+nodejs/node_modules/
+clojure/target
+clojure/classes
+clojure/checkouts
+clojure/pom.xml
+clojure/pom.xml.asc
+clojure/*.jar
+clojure/*.class
+clojure/.lein-*
+clojure/.nrepl-port
+clojure/.hgignore
+clojure/.hg/
 .DS_Store
+*.csv

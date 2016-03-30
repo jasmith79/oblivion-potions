@@ -47,7 +47,7 @@ const priority         = [
 
 /*   Imports   */
 const fs    = require('fs');
-const r     = require('../bower_components/ramda/dist/ramda.js');
+const r     = require('./node_modules/ramda/dist/ramda.js');
 
 /*   Functions   */
 const toSeconds = ([secs, ns]) => ((secs * BILLION + ns) / BILLION).toFixed(2);
@@ -173,9 +173,9 @@ let potions = ((list) => {
         for (k; k < l; ++k) {
           potion = new Potion(n + i + j + k, list[n], list[i], list[j], list[k]);
           if (potion.score > MIN_POTION_SCORE) {
-            if (VERBOSE) {
-              console.log(potion.recipe);
-            }
+            // if (VERBOSE) {
+            //   console.log(potion.recipe);
+            // }
             arr.push(potion);
           }
         }
@@ -223,9 +223,9 @@ let combos = ((list) => {
         for (k; k < l; ++k) {
           combo = new Combo(list[n], list[i], list[j], list[k]);
           if (combo.score > MIN_COMBO_SCORE) {
-            if (VERBOSE) {
-              console.log(combo.recipe);
-            }
+            // if (VERBOSE) {
+            //   console.log(combo.recipe);
+            // }
             arr.push(combo);
           }
         }
