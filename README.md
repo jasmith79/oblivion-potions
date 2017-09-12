@@ -1,6 +1,6 @@
-#Oblivion Potion Generator
+# Oblivion Potion Generator
 
-##The Why
+## The Why
 
 I truly enjoy playing Elder Scrolls games, and Oblivion is no exception. But the Alchemy skill is seriously
 nerfed compared to previous TES titles. Since you can only drink four potions at once (barring a glitch or mods),
@@ -18,7 +18,7 @@ to generate an optimal list of *potion combinations*.
 Fortunately there is plenty of potential for parallelization of the process. One of my ultimate goals of
 this project is using it for language acquisition.
 
-##The Spec
+## The Spec
 
 To be conformant, an implementation must generate the following:
 
@@ -56,8 +56,8 @@ To be conformant, an implementation must generate the following:
 
 Implementations must also provide command-line options for verbose output and runtime measurement.
 
-##Implementations
+## Implementations
 
-###Node.js
+### Node.js
 
 Runs in about 230 seconds.
