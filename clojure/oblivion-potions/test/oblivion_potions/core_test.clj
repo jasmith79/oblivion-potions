@@ -1,7 +1,8 @@
 (ns oblivion-potions.core-test
-  (:require [clojure.test :refer :all]
-            [oblivion-potions.core :refer :all]))
+  (:require 
+   [clojure.test :refer :all]
+   [oblivion-potions.core :refer :all]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(deftest abc
+  (testing "FIX ME"
+    (is (= 1 1))))
