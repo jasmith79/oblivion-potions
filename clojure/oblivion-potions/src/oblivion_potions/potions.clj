@@ -2,10 +2,24 @@
   (:require
    [clojure.string :refer [includes?]]
    [clojure.set :refer [subset?]]
-   [oblivion-potions.utils :refer [partition-with]]))
+   [oblivion-potions.utils :refer [partition-with]]
+   [clojure.core.reducers :as r]))
 
 (def positives ["Reflect Damage"
                 "Reflect Spell"
+
+                ; This up here
+                ; because of rarity
+                ; and not necessarily
+                ; efficacy or desirability
+                "Fortify Fatigue"
+
+                ; Not actually present, but
+                ; pads the scoring for the rare
+                ; effects
+                "Resist Magicka"
+                "Spell Absorption"
+
                 "Fortify Health"
                 "Fortify Endurance"
                 "Fortify Magicka"
@@ -18,9 +32,6 @@
                 "Fortify Agility"
                 "Fortify Intelligence"
                 "Fortify Willpower"
-                "Fortify Fatigue"
-                "Resist Magicka"
-                "Spell Absorption"
                 "Fire Shield"
                 "Frost Shield"
                 "Restore Endurance"
@@ -153,6 +164,26 @@
             [[] true]
             potions)))
 
+;; slower than the non/transient version using reduce
+;; (defn filter-potions
+;;   [potions potion]
+;;   (let [[potion-effects] potion]
+;;     (loop [i 0 
+;;            keep-new true 
+;;            keepers (transient [])]
+;;       (let [old-potion (get potions i)]
+;;         (if (nil? old-potion)
+;;           [(persistent! keepers) keep-new]
+;;           (let [[old-effects] old-potion
+;;                 old-is-better (better? old-effects potion-effects)
+;;                 new-is-better (better? potion-effects old-effects)
+;;                 still-keep-new (and keep-new (not old-is-better))
+;;                 keep-old (and (not= old-effects potion-effects)
+;;                               (not new-is-better))]
+;;             (recur (inc i) 
+;;                    still-keep-new
+;;                    (if keep-old (conj! keepers old-potion) keepers))))))))
+
 (defn swapper
   "Takes a seq of potions and a new potion and conjs the new potion
    onto the result of dropping all potions from the existing list
@@ -169,7 +200,54 @@
             [_effects {score :score}] potion]
         (when (> score threshold)
           (swap! potions swapper potion))))
-    (deref potions)))
+     (deref potions)))
+
+;; Slowest version?
+;; (defn create-potions
+;;   [ingredients scoring-fn threshold combinations]
+;;   (reduce (fn 
+;;             [keepers combo] 
+;;             (let [potion (create-potion ingredients scoring-fn combo)
+;;                   keep-new (atom true)
+;;                   [potion-effects {score :score}] potion]
+;;               (if (> score threshold)
+;;                 (let [fltrd (reduce (fn 
+;;                                       [acc old-potion]
+;;                                       (let [[old-effects] old-potion
+;;                                             old-is-better (better? old-effects potion-effects)
+;;                                             new-is-better (better? potion-effects old-effects)
+;;                                             keep-old (and (not= old-effects potion-effects)
+;;                                                           (not new-is-better))]
+;;                                         (if (and @keep-new old-is-better)
+;;                                           (reset! keep-new false))
+;;                                         (if keep-old
+;;                                           (conj acc old-potion)
+;;                                           acc))) 
+;;                                     [] 
+;;                                     keepers)]
+;;                   (if @keep-new
+;;                     (conj fltrd potion)
+;;                     fltrd))
+;;                 keepers))) 
+;;           [] 
+;;           combinations))
+
+;; This is slower than the atom version, even for super large seqs
+;; (defn create-reducer
+;;   [ingredients scoring-fn threshold]
+;;   (fn 
+;;     ([] [])
+;;     ([potions combo]
+;;      (let [potion (create-potion ingredients scoring-fn combo)
+;;            [_effects {score :score}] potion
+;;            [keepers keep-new] (filter-potions potions potion)]
+;;        (if (and keep-new (> score threshold))
+;;          (conj keepers potion)
+;;          potions)))))
+
+;; (defn create-potions
+;;   [ingredients scoring-fn threshold combinations]
+;;   (r/fold concat (create-reducer ingredients scoring-fn threshold) combinations))
 
 (defn format-potion
   "The 'potion' data structure is a 2-tuple rather than a map and
@@ -181,3 +259,19 @@
    :positive-effects (vec (sort positive-effects))
    :score score
    :ingredients (vec (sort (map (comp second first (partial get ingreds)) ingredients)))})
+
+(defn best-by-effect
+  [potions]
+  (vec (set (filter seq 
+                    (vals (reduce (fn [best potion]
+                                    (let [{score "score" pos "positive-effects"} potion]
+                                      (reduce (fn [res effect]
+                                                (let [existing (res effect)]
+                                                  (if (or (nil? existing)
+                                                          (> score (existing "score")))
+                                                    (assoc res effect potion)
+                                                    res)))
+                                              best
+                                              pos)))
+                                  (into {} (map (fn [k] [k nil]) positives))
+                                  potions))))))

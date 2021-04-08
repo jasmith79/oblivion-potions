@@ -14,7 +14,7 @@ Blister Pod CapSI,Restore Magicka,Fortify Magicka,Night-Eye,Invisibility
 Bloodgrass,Chameleon,Resist Paralysis,Burden,Fortify Health
 Boar Meat,Restore Health,Damage Speed,Fortify Health,Burden
 Bog Beacon Asco Cap,Restore Magicka,Shield,Damage Personality,Damage Endurance
-Bone MarrowSI,Damage Health,Frost Damage,Damage Magicka,Paralyze
+Bone MarrowSI,Damage Health,Frost Damage,Damage Magicka,Paralysis
 Bone ShardSI,Restore Willpower,Frost Shield,Damage Magicka,Damage Luck
 Bonemeal,Damage Fatigue,Resist Fire,Fortify Luck,Night-Eye
 Bread Loaf,Restore Fatigue,Detect Life,Damage Agility,Damage Strength
@@ -24,7 +24,7 @@ Cheese Wedge,Restore Fatigue,Resist Fire,Fire Shield,Damage Agility
 Cheese Wheel,Restore Fatigue,Resist Paralysis,Damage Luck,Fortify Willpower
 Cinnabar Polypore Cap Red,Restore Agility,Shield,Damage Personality,Damage Endurance
 Cinnabar Polypore Cap Yellow,Restore Endurance,Fortify Endurance,Damage Personality,Reflect Spell
-Clannfear Claws,Cure Disease,Resist Disease,Paralyze,Damage Health
+Clannfear Claws,Cure Disease,Resist Disease,Paralysis,Damage Health
 Clouded Funnel Cap,Restore Intelligence,Fortify Intelligence,Damage Endurance,Damage Magicka
 Columbine Root Pulp,Restore Personality,Resist Frost,Fortify Magicka,Chameleon
 Congealed PutrescenceSI,Restore Strength,Fire Damage,Restore Magicka,Damage Health
@@ -32,7 +32,7 @@ Corn,Restore Fatigue,Restore Intelligence,Damage Agility,Shock Shield
 Crab Meat,Restore Endurance,Resist Shock,Damage Fatigue,Fire Shield
 Daedra Heart,Restore Health,Shock Shield,Damage Magicka,Silence
 Daedra Silk,Burden,Night-Eye,Chameleon,Damage Endurance
-Daedra Venin,Paralyze,Restore Fatigue,Damage Health,Reflect Damage
+Daedra Venin,Paralysis,Restore Fatigue,Damage Health,Reflect Damage
 Daedroth Teeth,Night-Eye,Frost Shield,Burden,Light
 Dog FoodSI,Fortify Health,Damage Fatigue,Dispel,Damage Magicka
 Dragon's Tongue,Resist Fire,Damage Health,Restore Health,Fire Shield
@@ -42,7 +42,7 @@ Ectoplasm,Shock Damage,Dispel,Fortify Magicka,Damage Health
 Elf Cup Cap,Damage Willpower,Cure Disease,Fortify Strength,Damage Intelligence
 Elytra IchorSI,Restore Magicka,Burden,Chameleon,Silence
 Emetic Russula Cap,Restore Agility,Shield,Damage Personality,Damage Endurance
-Fennel Seeds,Restore Fatigue,Damage Intelligence,Damage Magicka,Paralyze
+Fennel Seeds,Restore Fatigue,Damage Intelligence,Damage Magicka,Paralysis
 Fire Salts,Fire Damage,Resist Frost,Restore Magicka,Fire Shield
 Flame StalkSI,Restore Health,Fire Damage,Frost Shield,Invisibility
 Flax Seeds,Restore Magicka,Feather,Shield,Damage Health
@@ -61,7 +61,7 @@ Green Stain Cup Cap,Restore Fatigue,Damage Speed,Reflect Damage,Damage Health
 Green Stain Shelf Cap,Restore Luck,Fortify Luck,Damage Fatigue,Restore Health
 Grummite EggsSI,Damage Magicka,Dispel,Chameleon,Silence
 Ham,Restore Fatigue,Restore Health,Damage Magicka,Damage Luck
-Harrada,Damage Health,Damage Magicka,Silence,Paralyze
+Harrada,Damage Health,Damage Magicka,Silence,Paralysis
 Hound ToothSI,Cure Poison,Detect Life,Burden,Invisibility
 Hunger TongueSI,Cure Poison,Cure Disease,Fire Damage,Fortify Magicka
 Hydnum Azure Giant SporeSI,Restore Endurance,Detect Life,Fortify Health,Frost Shield
@@ -75,7 +75,7 @@ Letifer Orca Digestive SlimeSI,Damage Health,Damage Fatigue,Damage Magicka,Resto
 Lettuce,Restore Fatigue,Restore Luck,Fire Shield,Damage Personality
 Lichor,Restore Magicka, , , 
 Mandrake Root,Cure Disease,Resist Poison,Damage Agility,Fortify Willpower
-Milk Thistle Seeds,Light,Frost Damage,Cure Paralysis,Paralyze
+Milk Thistle Seeds,Light,Frost Damage,Cure Paralysis,Paralysis
 Minotaur Horn,Restore Willpower,Burden,Fortify Endurance,Resist Paralysis
 Monkshood Root Pulp,Restore Strength,Damage Intelligence,Fortify Endurance,Burden
 Morning Glory Root Pulp,Burden,Damage Willpower,Frost Shield,Damage Magicka
@@ -101,7 +101,7 @@ Redwort Flower,Resist Frost,Cure Poison,Damage Health,Invisibility
 Refined Frost Salts,Frost Damage,Frost Shield,Resist Fire,Silence
 Rice,Restore Fatigue,Silence,Shock Shield,Damage Agility
 Root Pulp,Cure Disease,Damage Willpower,Fortify Strength,Damage Intelligence
-Rot ScaleSI,Burden,Damage Health,Silence,Paralyze
+Rot ScaleSI,Burden,Damage Health,Silence,Paralysis
 Sacred Lotus Seeds,Resist Frost,Damage Health,Feather,Dispel
 Scales,Damage Willpower,Water Breathing,Damage Health,Water Walking
 Scalon FinSI,Water Breathing,Damage Health,Shock Damage,Burden
@@ -141,5 +141,5 @@ White Seed Pod,Restore Strength,Water Breathing,Silence,Light
 Wisp CoreSI,Restore Intelligence,Burden,Light,Chameleon
 Wisp Stalk Caps,Damage Health,Damage Willpower,Damage Intelligence,Fortify Speed
 Withering MoonSI,Restore Magicka,Shield,Cure Disease,Reflect Spell
-Worm's Head CapSI,Restore Luck,Night-Eye,Fortify Fatigue,Paralyze
+Worm's Head CapSI,Restore Luck,Night-Eye,Fortify Fatigue,Paralysis
 Wormwood Leaves,Fortify Fatigue,Invisibility,Damage Health,Damage Magicka

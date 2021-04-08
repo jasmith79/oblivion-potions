@@ -42,3 +42,22 @@
        (reduce + (map #(negative-weights % 0) negative-effects)))))
 
 (def default-scorer (create-scoring-fn positive-weights negative-weights))
+
+(defn reduce-effect
+  [weights repeat-fn eff]
+  (reduce (fn 
+            [acc [idx effect]]
+            (+ acc (repeat-fn (weights effect 5) (inc idx)))) 
+          0 
+          (map-indexed (fn [& args] args) eff)))
+
+(defn default-combo-scorer
+  "Scores 4-potion combos"
+  [negatives positives]
+  (- (reduce (fn [acc x] (+ acc x)) 
+             0 
+             (map (partial reduce-effect 
+                           positive-weights 
+                           (fn [weight mod] (quot (* weight weight) mod))) 
+                  positives))
+     (reduce + 0 (map (partial reduce-effect negative-weights *) negatives))))

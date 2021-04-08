@@ -48,7 +48,7 @@
 ;     "Fortify Personality"])
 ;
 ; ;;Returns first match for negative effects, else nil
-; (defn negative? [effect] (re-find #"(?i)damage|drain|paralyze|burden|silence" effect))
+; (defn negative? [effect] (re-find #"(?i)damage|drain|Paralysis|burden|silence" effect))
 ; (defn positive? [effect] (not (negative? effect)))
 ;
 ; ;;Returns a filtering fn accumulating least n items per each effect in the collection
@@ -197,7 +197,7 @@
     "Fortify Personality"])
 
 ;;Returns first match for negative effects, else nil
-(defn negative? [effect] (re-find #"(?i)damage|drain|paralyze|burden|silence" effect))
+(defn negative? [effect] (re-find #"(?i)damage|drain|Paralysis|burden|silence" effect))
 (defn positive? [effect] (not (negative? effect)))
 
 ;;Returns a filtering fn accumulating least n items per each effect in the collection

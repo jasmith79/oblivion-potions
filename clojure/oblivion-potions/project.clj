@@ -8,4 +8,5 @@
                  [org.clojure/data.json "1.0.0"]]
   :main ^:skip-aot oblivion-potions.core
   :target-path "target/%s"
+  :jvm-opts ["-Xmx8g"]
   :profiles {:uberjar {:aot [oblivion-potions.core]}})
